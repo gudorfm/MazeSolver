@@ -16,5 +16,3 @@ Once you've done that simply run the program to have the bot solve the maze.  It
 There are three difficulties you can choose from, `BEGINNER`, `ADVANCED`, and `EXPERT`.
 The default is beginner, you can change the difficulty by modifying the appropriate field in `login.json`.
 The dificulty must be in all caps to work properly, otherwise the maze will fail to innitiate the program will not run correctly.
-
-Good luck!
