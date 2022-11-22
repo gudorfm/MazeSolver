@@ -2,7 +2,7 @@
 
 public class Solver {
 
-    public String facing = "south";  
+    public String facing = "SOUTH"; 
     public int coins = 0;
     public int id = 0;
     public boolean foundDoor = false;
@@ -43,23 +43,65 @@ public class Solver {
     }
 
     public void turnRight(){
-
+        if(facing == "NORTH"){
+            facing = "EAST";
+        }
+        else if(facing == "EAST"){
+            facing = "SOUTH";
+        }
+        else if(facing == "SOUTH"){
+            facing = "WEST";
+        }
+        else if(facing == "WEST"){
+            facing = "NORTH";
+        }else{
+            System.out.println("Invalid value in facing, don't know how this happened but the apllication is broken");
+        }
     }
 
     public void turnLeft(){
-
+        if(facing == "NORTH"){
+            facing = "WEST";
+        }
+        else if(facing == "EAST"){
+            facing = "NORTH";
+        }
+        else if(facing == "SOUTH"){
+            facing = "EAST";
+        }
+        else if(facing == "WEST"){
+            facing = "SOUTH";
+        }else{
+            System.out.println("Invalid value in facing, don't know how this happened but the apllication is broken");
+        }
     }
 
     public void turnAround(){
-
+        if(facing == "NORTH"){
+            facing = "SOUTH";
+        }
+        else if(facing == "EAST"){
+            facing = "WEST";
+        }
+        else if(facing == "SOUTH"){
+            facing = "NORTH";
+        }
+        else if(facing == "WEST"){
+            facing = "EAST";
+        }else{
+            System.out.println("Invalid value in facing, don't know how this happened but the apllication is broken");
+        }
     }
 
     public void move(){
-
+        // Make API call to step in the direction of facing
     }
 
     public void pickupCoin(){
         // Make API call to pickup a coin
         coins++;
+        if(coins == 3 && foundDoor){
+            turnAround();
+        }
     }
 }
