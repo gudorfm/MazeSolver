@@ -3,5 +3,5 @@ public class Location {
     public String East;
     public String South;
     public String West;
-    public String on;
+    public String On;
 }
