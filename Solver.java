@@ -15,6 +15,15 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.*;
   
+/**
+ * TODO
+ * Handle Exceptions properly
+ * Navigation logic
+ * GET maze information
+ * Display maze information
+ * Parse location information into Location object
+ */
+
 
 public class Solver {
 
@@ -33,6 +42,10 @@ public class Solver {
         solver.run();
     }
 
+    /**
+     * Creates a maze then handles the logic for navigating the maze and displaying information in the terminal
+     * @throws Exception Can throw IOException, ParseException and InterruptedException.  Will handle exceptions in methods in the future
+     */
     public void run() throws Exception{
         
         getLoginInfo();
@@ -62,6 +75,7 @@ public class Solver {
             }
             done = true; // Temporary fix to avoid infinite loop
         }
+        deleteMaze(); // Gives up the current maze run.  This is here to prevent large numbers of abandoned games on server during testing
     }
 
     /***
@@ -75,7 +89,6 @@ public class Solver {
         username = (String) json.get("Username");
         password = (String) json.get("Password");
         difficulty = (String) json.get("Difficulty");
-
         }
         catch(FileNotFoundException e){
             System.out.println("login file not found.  Make sure login.json is present in the project folder.");
@@ -99,11 +112,27 @@ public class Solver {
     }
 
     // Gets the information about the tile that the bot is on and the surrounding tiles
-    public Location getLocation(){
+    public Location getLocation() throws Exception{
         Location location = new Location();
-        // Make api call for location information
-        // Parse json into location object
+        HttpRequest locationRequest = HttpRequest.newBuilder()
+        .uri(URI.create(baseUri + id + "/steps"))
+        .GET()
+        .build();
+
+        HttpResponse<String> locationResponse = client.send(locationRequest, BodyHandlers.ofString());
+
+        JSONObject locationData = (JSONObject) new JSONParser().parse(locationResponse.body());
+        System.out.println("Location Data");
+        System.out.println(locationData);
+
         return location;
+    }
+
+    /**
+     * Gets general information about the maze such as id, coins gathered, time left, etc
+     */
+    public void getMazeInfo(){
+        
     }
 
     // Allows the bot to switch from right hand rule to left hand rule
@@ -128,7 +157,7 @@ public class Solver {
         else if(facing == "WEST"){
             facing = "NORTH";
         }else{
-            System.out.println("Invalid value in facing, don't know how this happened but the apllication is broken");
+            System.out.println("Invalid value in facing, don't know how this happened but the application is broken");
         }
     }
 
@@ -148,7 +177,7 @@ public class Solver {
         else if(facing == "WEST"){
             facing = "SOUTH";
         }else{
-            System.out.println("Invalid value in facing, don't know how this happened but the apllication is broken");
+            System.out.println("Invalid value in facing, don't know how this happened but the application is broken");
         }
     }
 
@@ -166,7 +195,7 @@ public class Solver {
         else if(facing == "WEST"){
             facing = "EAST";
         }else{
-            System.out.println("Invalid value in facing, don't know how this happened but the apllication is broken");
+            System.out.println("Invalid value in facing, don't know how this happened but the application is broken");
         }
     }
 
@@ -209,5 +238,14 @@ public class Solver {
             return true;
         }
         return false;
+    }
+
+    public void deleteMaze() throws Exception{
+        HttpRequest deleteMazeRequest = HttpRequest.newBuilder()
+        .uri(URI.create(baseUri + id))
+        .DELETE()
+        .build();
+
+        client.send(deleteMazeRequest, BodyHandlers.ofString());
     }
 }
