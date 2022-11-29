@@ -26,7 +26,7 @@ public class Solver {
     public HttpClient client;
     public String username = "";
     public String password = "";
-    public String authHeader = "";
+    public String difficulty = "BEGINNER";
 
     public static void main(String args[]) throws Exception{
         Solver solver = new Solver();
@@ -35,7 +35,7 @@ public class Solver {
 
     public void run() throws Exception{
         
-        getUsernameAndPassword();
+        getLoginInfo();
 
         client = HttpClient.newBuilder()
             .authenticator(new Authenticator() {
@@ -67,12 +67,14 @@ public class Solver {
     /***
      * Reads login.json to get the username and password
      */
-     public void getUsernameAndPassword(){
+     public void getLoginInfo(){
         try {
         Object input = new JSONParser().parse(new FileReader("login.json"));
         JSONObject json = (JSONObject) input;
 
-        System.out.println(json.get("Username"));
+        username = (String) json.get("Username");
+        password = (String) json.get("Password");
+        difficulty = (String) json.get("Difficulty");
 
         }
         catch(FileNotFoundException e){
@@ -86,7 +88,7 @@ public class Solver {
     // Creates a new maze and stores the maze id for future api calls
     public void createNewMaze() throws Exception{
         HttpRequest newMazeRequest = HttpRequest.newBuilder()
-        .uri(URI.create(baseUri + "?=BEGGINER"))
+        .uri(URI.create(baseUri + "?=" + difficulty))
         .POST(BodyPublishers.ofString("{\"Accept\": \"*/*\"}"))
         .build();
 
