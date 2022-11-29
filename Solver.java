@@ -95,7 +95,7 @@ public class Solver {
         HttpResponse<String> newMazeResponse = client.send(newMazeRequest, BodyHandlers.ofString());
 
         System.out.println(newMazeResponse);
-        id = 0;  // Make API call to create a new maze and save the returned maze id;
+        id = Integer.parseInt(newMazeResponse.body());  // Make API call to create a new maze and save the returned maze id;
     }
 
     // Gets the information about the tile that the bot is on and the surrounding tiles
