@@ -1,18 +1,38 @@
-
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest.BodyPublishers;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.net.http.HttpResponse.BodyHandlers;
+import java.net.Authenticator;
+import java.net.PasswordAuthentication;
+import java.net.URI;
 
 public class Solver {
 
     public String facing = "SOUTH"; 
+    public String baseUri = "https://coding-challanges.herokuapp.com/api/mazes/";
     public int coins = 0;
     public int id = 0;
     public boolean foundDoor = false;
-    public static void main(String args[]){
+    public HttpClient client;
+
+    public static void main(String args[]) throws Exception{
         Solver solver = new Solver();
         solver.run();
     }
 
-    public void run(){
+    public void run() throws Exception{
         boolean done = false;
+
+        client = HttpClient.newBuilder()
+            .authenticator(new Authenticator() {
+                @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication("", "".toCharArray());
+            }
+        })
+            .build();
+
         createNewMaze();
 
         while(!done){
@@ -30,7 +50,15 @@ public class Solver {
     }
 
     // Creates a new maze and stores the maze id for future api calls
-    public void createNewMaze(){
+    public void createNewMaze() throws Exception{
+        HttpRequest newMazeRequest = HttpRequest.newBuilder()
+        .uri(URI.create(baseUri + "/?=BEGGINER"))
+        .POST(BodyPublishers.ofString("{\"Accept\": \"*/*\"}"))
+        .build();
+
+        HttpResponse<String> newMazeResponse = client.send(newMazeRequest, BodyHandlers.ofString());
+
+        System.out.println(newMazeResponse);
         id = 0;  // Make API call to create a new maze and save the returned maze id;
     }
 
