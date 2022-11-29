@@ -6,6 +6,15 @@ import java.net.http.HttpResponse.BodyHandlers;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.net.URI;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.util.Iterator;
+import java.util.Map;
+  
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.*;
+  
 
 public class Solver {
 
@@ -15,6 +24,9 @@ public class Solver {
     public int id = 0;
     public boolean foundDoor = false;
     public HttpClient client;
+    public String username = "";
+    public String password = "";
+    public String authHeader = "";
 
     public static void main(String args[]) throws Exception{
         Solver solver = new Solver();
@@ -22,19 +34,22 @@ public class Solver {
     }
 
     public void run() throws Exception{
-        boolean done = false;
+        
+        getUsernameAndPassword();
 
         client = HttpClient.newBuilder()
             .authenticator(new Authenticator() {
                 @Override
             protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication("", "".toCharArray());
+                return new PasswordAuthentication(username, password.toCharArray());
             }
         })
             .build();
+        
 
         createNewMaze();
 
+        boolean done = false;
         while(!done){
             Location location = getLocation();
             if(location.On == "coin"){
@@ -49,10 +64,29 @@ public class Solver {
         }
     }
 
+    /***
+     * Reads login.json to get the username and password
+     */
+     public void getUsernameAndPassword(){
+        try {
+        Object input = new JSONParser().parse(new FileReader("login.json"));
+        JSONObject json = (JSONObject) input;
+
+        System.out.println(json.get("Username"));
+
+        }
+        catch(FileNotFoundException e){
+            System.out.println("login file not found.  Make sure login.json is present in the project folder.");
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+     }
+
     // Creates a new maze and stores the maze id for future api calls
     public void createNewMaze() throws Exception{
         HttpRequest newMazeRequest = HttpRequest.newBuilder()
-        .uri(URI.create(baseUri + "/?=BEGGINER"))
+        .uri(URI.create(baseUri + "?=BEGGINER"))
         .POST(BodyPublishers.ofString("{\"Accept\": \"*/*\"}"))
         .build();
 
