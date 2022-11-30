@@ -6,6 +6,7 @@ import java.net.http.HttpResponse.BodyHandlers;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.net.URI;
+
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.Iterator;
@@ -14,6 +15,9 @@ import java.util.Map;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.*;
+
+import data.Location;
+import data.MazeData;
   
 /**
  * TODO
@@ -64,8 +68,9 @@ public class Solver {
 
         boolean done = false;
         while(!done){
+            System.out.println(getMazeData());
             Location location = getLocation();
-            if(location.On == "coin"){
+            if(location.on == "coin"){
                 pickupCoin();
             }
             if(coins == 3){
@@ -107,7 +112,6 @@ public class Solver {
 
         HttpResponse<String> newMazeResponse = client.send(newMazeRequest, BodyHandlers.ofString());
 
-        System.out.println(newMazeResponse);
         id = Integer.parseInt(newMazeResponse.body());  // Make API call to create a new maze and save the returned maze id;
     }
 
@@ -123,7 +127,12 @@ public class Solver {
 
         JSONObject locationData = (JSONObject) new JSONParser().parse(locationResponse.body());
         System.out.println("Location Data");
-        System.out.println(locationData);
+
+        location.north = (String) locationData.get("NORTH");
+        location.east = (String) locationData.get("EAST");
+        location.south = (String) locationData.get("SOUTH");
+        location.west = (String) locationData.get("WEST");
+        location.on = (String) locationData.get("ON");
 
         return location;
     }
@@ -131,11 +140,26 @@ public class Solver {
     /**
      * Gets general information about the maze such as id, coins gathered, time left, etc
      */
-    public void getMazeInfo(){
+    public MazeData getMazeData() throws Exception{
+        MazeData mazeData = new MazeData();
+        HttpRequest dataRequest = HttpRequest.newBuilder()
+        .uri(URI.create(baseUri + id))
+        .GET()
+        .build();
+
+        HttpResponse<String> dataResponse = client.send(dataRequest, BodyHandlers.ofString());
+
+        JSONObject data = (JSONObject) new JSONParser().parse(dataResponse.body());
+        System.out.println(data); 
         
+        mazeData.bumps = Integer.parseInt((String) data.get("bumps"));
+
+        return mazeData;
     }
 
-    // Allows the bot to switch from right hand rule to left hand rule
+    /**
+     * Turns the bot either to the right or left depending on whether it is still searching for coins or heading to the exit
+     */
     public void turn(){
         if(coins == 3 && foundDoor){
             turnLeft();
@@ -221,19 +245,19 @@ public class Solver {
      * @return True if the bot is next to the exit, false otherwise
      */
     public boolean checkDoorAdjacency(Location location){
-        if(location.North == "EXIT"){
+        if(location.north == "EXIT"){
             facing = "NORTH";
             return true;
         }
-        else if(location.East == "EXIT"){
+        else if(location.east == "EXIT"){
             facing = "EAST";
             return true;
         }
-        else if(location.South == "EXIT"){
+        else if(location.south == "EXIT"){
             facing = "SOUTH";
             return true;
         }
-        else if(location.West == "EXIT"){
+        else if(location.west == "EXIT"){
             facing = "WEST";
             return true;
         }
