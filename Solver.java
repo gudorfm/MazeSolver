@@ -126,7 +126,6 @@ public class Solver {
         HttpResponse<String> locationResponse = client.send(locationRequest, BodyHandlers.ofString());
 
         JSONObject locationData = (JSONObject) new JSONParser().parse(locationResponse.body());
-        System.out.println("Location Data");
 
         location.north = (String) locationData.get("NORTH");
         location.east = (String) locationData.get("EAST");
@@ -152,7 +151,9 @@ public class Solver {
         JSONObject data = (JSONObject) new JSONParser().parse(dataResponse.body());
         System.out.println(data); 
         
-        mazeData.bumps = Integer.parseInt((String) data.get("bumps"));
+        mazeData.bumps = (long) data.get("bumps");
+        mazeData.coins = (long) data.get("coins");
+        mazeData.secondsLeft = (long) data.get("secondsLeft");
 
         return mazeData;
     }
