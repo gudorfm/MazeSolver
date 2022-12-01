@@ -224,8 +224,13 @@ public class Solver {
         }
     }
 
-    public void move(){
-        // Make API call to step in the direction of facing
+    public void move() throws Exception{
+        HttpRequest moveRequest = HttpRequest.newBuilder()
+        .uri(URI.create(baseUri + "?=" + facing))
+        .POST(BodyPublishers.ofString("{\"Accept\": \"*/*\"}"))
+        .build();
+
+        client.send(moveRequest, BodyHandlers.ofString());
     }
 
     public void pickupCoin(){
