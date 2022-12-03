@@ -106,7 +106,7 @@ public class Solver {
     // Creates a new maze and stores the maze id for future api calls
     public void createNewMaze() throws Exception{
         HttpRequest newMazeRequest = HttpRequest.newBuilder()
-        .uri(URI.create(baseUri + "?=" + difficulty))
+        .uri(URI.create(baseUri + "?level=" + difficulty))
         .POST(BodyPublishers.ofString("{\"Accept\": \"*/*\"}"))
         .build();
 
